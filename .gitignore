@@ -9,3 +9,4 @@ dist
 tsconfig.tsbuildinfo
 data/*.json
 .vercel
+.env*
