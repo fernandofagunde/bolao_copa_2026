@@ -35,7 +35,7 @@ export default async function RootLayout({
                   Apostas
                 </Link>
                 <Link
-                  href={loggedIn ? "/apostar" : "/login?next=/apostar"}
+                  href="/login?next=/apostar&force=1"
                   className="rounded-md bg-emerald-700 px-3 py-2 text-white hover:bg-emerald-800"
                 >
                   Apostar

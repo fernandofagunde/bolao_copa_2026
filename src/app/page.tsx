@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { deleteBet } from "@/app/actions";
 import { isAuthenticated } from "@/lib/auth";
 import { readLocalBets } from "@/lib/local-bets";
 import { BET_AMOUNT_CENTS, formatBRLFromCents } from "@/lib/money";
@@ -123,7 +122,7 @@ export default async function Home({
             </h1>
           </div>
           <Link
-            href={loggedIn ? "/apostar" : "/login?next=/apostar"}
+            href="/login?next=/apostar&force=1"
             className="inline-flex h-11 items-center justify-center rounded-md bg-stone-950 px-5 text-sm font-bold text-white hover:bg-stone-800"
           >
             Fazer aposta
@@ -176,24 +175,12 @@ export default async function Home({
                     {formatBRLFromCents(bet.amountCents)}
                   </span>
                   <div className="sm:text-right">
-                    {loggedIn ? (
-                      <form action={deleteBet}>
-                        <input type="hidden" name="betId" value={bet.id} />
-                        <button
-                          type="submit"
-                          className="h-9 rounded-md border border-red-200 px-3 text-sm font-bold text-red-700 hover:bg-red-50"
-                        >
-                          Apagar
-                        </button>
-                      </form>
-                    ) : (
-                      <Link
-                        href="/login?next=/"
-                        className="inline-flex h-9 items-center rounded-md border border-red-200 px-3 text-sm font-bold text-red-700 hover:bg-red-50"
-                      >
-                        Apagar
-                      </Link>
-                    )}
+                    <Link
+                      href={`/login?next=${encodeURIComponent(`/apagar?betId=${bet.id}`)}&force=1`}
+                      className="inline-flex h-9 items-center rounded-md border border-red-200 px-3 text-sm font-bold text-red-700 hover:bg-red-50"
+                    >
+                      Apagar
+                    </Link>
                   </div>
                 </li>
               ))}

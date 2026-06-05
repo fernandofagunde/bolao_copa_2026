@@ -5,17 +5,18 @@ import { isAuthenticated, sanitizeNextPath } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-type SearchParams = Promise<{ erro?: string; next?: string }>;
+type SearchParams = Promise<{ erro?: string; force?: string; next?: string }>;
 
 export default async function LoginPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { erro, next } = await searchParams;
+  const { erro, force, next } = await searchParams;
   const nextPath = sanitizeNextPath(next ?? "/apostar");
+  const forceLogin = force === "1";
 
-  if (await isAuthenticated()) {
+  if (!forceLogin && (await isAuthenticated())) {
     redirect(nextPath);
   }
 
