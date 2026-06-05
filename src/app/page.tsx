@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { isAuthenticated } from "@/lib/auth";
 import { readLocalBets } from "@/lib/local-bets";
 import { BET_AMOUNT_CENTS, formatBRLFromCents } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
@@ -34,7 +33,6 @@ export default async function Home({
   searchParams: SearchParams;
 }) {
   const { erro } = await searchParams;
-  const loggedIn = await isAuthenticated();
   let shouldReadLocalBets = !process.env.DATABASE_URL;
   let bets: BetView[] = [];
   let teamsWithBets: TeamCountView[] = WORLD_CUP_TEAMS.map((team) => ({
