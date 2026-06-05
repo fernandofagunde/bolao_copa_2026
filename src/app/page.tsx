@@ -27,7 +27,14 @@ type TeamCountView = {
   count: number;
 };
 
-export default async function Home() {
+type SearchParams = Promise<{ erro?: string }>;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  const { erro } = await searchParams;
   const loggedIn = await isAuthenticated();
   let shouldReadLocalBets = !process.env.DATABASE_URL;
   let bets: BetView[] = [];
@@ -122,6 +129,18 @@ export default async function Home() {
             Fazer aposta
           </Link>
         </div>
+
+        {erro ? (
+          <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+            {erro}
+          </div>
+        ) : null}
+
+        {!process.env.DATABASE_URL && process.env.NODE_ENV === "production" ? (
+          <div className="rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+            Configure a DATABASE_URL do Neon na Vercel para salvar e apagar apostas em produção.
+          </div>
+        ) : null}
 
         <div className="overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm">
           <div className="hidden grid-cols-[1fr_1fr_120px_110px] border-b border-stone-200 bg-stone-50 px-5 py-3 text-xs font-black uppercase tracking-normal text-stone-500 sm:grid">

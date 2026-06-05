@@ -30,6 +30,15 @@ const loginSchema = z.object({
   next: z.string().optional(),
 });
 
+function canUseLocalStorageFallback() {
+  return process.env.NODE_ENV !== "production";
+}
+
+function databaseRequiredRedirect(path: "/" | "/apostar") {
+  const message = "Configure a DATABASE_URL do Neon na Vercel para salvar e apagar apostas.";
+  redirect(`${path}?erro=${encodeURIComponent(message)}`);
+}
+
 export async function createBet(formData: FormData) {
   if (!(await isAuthenticated())) {
     redirect("/login?next=/apostar");
@@ -52,7 +61,16 @@ export async function createBet(formData: FormData) {
   }
 
   if (!process.env.DATABASE_URL) {
-    await upsertLocalBet({ bettorName, teamName });
+    if (!canUseLocalStorageFallback()) {
+      databaseRequiredRedirect("/apostar");
+    }
+
+    try {
+      await upsertLocalBet({ bettorName, teamName });
+    } catch {
+      redirect("/apostar?erro=Não foi possível salvar a aposta localmente.");
+    }
+
     revalidatePath("/");
     revalidatePath("/apostar");
     redirect("/");
@@ -79,7 +97,15 @@ export async function createBet(formData: FormData) {
       },
     });
   } catch {
-    await upsertLocalBet({ bettorName, teamName });
+    if (!canUseLocalStorageFallback()) {
+      redirect("/apostar?erro=Não foi possível salvar no banco de dados.");
+    }
+
+    try {
+      await upsertLocalBet({ bettorName, teamName });
+    } catch {
+      redirect("/apostar?erro=Não foi possível salvar a aposta localmente.");
+    }
   }
 
   revalidatePath("/");
@@ -102,10 +128,26 @@ export async function deleteBet(formData: FormData) {
     try {
       await prisma.bet.delete({ where: { id: betId } });
     } catch {
-      await deleteLocalBet(betId);
+      if (!canUseLocalStorageFallback()) {
+        redirect("/?erro=Não foi possível apagar no banco de dados.");
+      }
+
+      try {
+        await deleteLocalBet(betId);
+      } catch {
+        redirect("/?erro=Não foi possível apagar a aposta localmente.");
+      }
     }
   } else {
-    await deleteLocalBet(betId);
+    if (!canUseLocalStorageFallback()) {
+      databaseRequiredRedirect("/");
+    }
+
+    try {
+      await deleteLocalBet(betId);
+    } catch {
+      redirect("/?erro=Não foi possível apagar a aposta localmente.");
+    }
   }
 
   revalidatePath("/");

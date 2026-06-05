@@ -38,6 +38,12 @@ export default async function BetPage({
         </p>
       </div>
 
+      {!process.env.DATABASE_URL && process.env.NODE_ENV === "production" ? (
+        <div className="mb-5 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+          Configure a DATABASE_URL do Neon na Vercel para salvar apostas em produção.
+        </div>
+      ) : null}
+
       <form action={createBet} className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
         {erro ? (
           <div className="mb-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
