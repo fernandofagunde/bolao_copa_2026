@@ -1,0 +1,10 @@
+.DS_Store
+.next
+node_modules
+.env
+.env*.local
+generated
+coverage
+dist
+tsconfig.tsbuildinfo
+data/*.json
